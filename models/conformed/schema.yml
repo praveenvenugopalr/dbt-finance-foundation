@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: "Conformed customer dimension with derived attributes (age, tenure)"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        tests: [unique, not_null]
+      - name: full_name
+        description: "Concatenated first + last name"
+      - name: segment
+        description: "Customer segment (RETAIL, PREMIUM, PRIVATE)"
+      - name: tenure_months
+        description: "Months since onboarding"
+      - name: age
+        description: "Age in years derived from date_of_birth"
+
+  - name: dim_account
+    description: "Conformed account dimension with status and tenure"
+    columns:
+      - name: account_id
+        description: "Primary key"
+        tests: [unique, not_null]
+      - name: account_type
+        description: "SAV, CHQ, TD, LOAN"
+      - name: status
+        description: "ACTIVE, CLOSED, DORMANT"
+      - name: days_since_opening
+        description: "Days since account was opened"
+
+  - name: fct_transaction
+    description: "Conformed transaction fact with debit/credit classification"
+    columns:
+      - name: transaction_id
+        description: "Primary key"
+        tests: [unique, not_null]
+      - name: amount
+        description: "Signed amount (positive=credit, negative=debit)"
+      - name: debit_credit_flag
+        description: "Derived: CREDIT, DEBIT, or ZERO"
+      - name: absolute_amount
+        description: "Unsigned transaction amount"
+      - name: channel
+        description: "Transaction channel (BRANCH, ATM, MOBILE, INTERNET)"
+
+  - name: fct_daily_balance
+    description: "Daily account balance snapshots with hold calculations"
+    columns:
+      - name: account_id
+        description: "FK to dim_account"
+        tests: [not_null]
+      - name: balance_date
+        description: "Snapshot date"
+        tests: [not_null]
+      - name: closing_balance
+        description: "End-of-day balance"
+      - name: hold_amount
+        description: "Derived: closing_balance minus available_balance"

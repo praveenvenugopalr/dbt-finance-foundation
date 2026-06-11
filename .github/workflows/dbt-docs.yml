@@ -1,0 +1,41 @@
+name: Generate dbt Docs
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt
+        run: pip install dbt-duckdb
+
+      - name: Build project
+        run: |
+          dbt seed --profiles-dir .
+          dbt run --profiles-dir .
+          dbt docs generate --profiles-dir .
+
+      - name: Upload dbt docs artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-docs-finance-foundation
+          path: |
+            target/manifest.json
+            target/catalog.json
+            target/index.html
+
+      - name: Trigger docs rebuild
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DOCS_DISPATCH_TOKEN }}
+          repository: ${{ github.repository_owner }}/consolidated-dbt-docs
+          event-type: docs-updated
+          client-payload: '{"project": "finance_foundation", "repo": "${{ github.repository }}"}'

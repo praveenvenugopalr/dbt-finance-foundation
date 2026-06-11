@@ -1,0 +1,8 @@
+duckdb_local:
+  target: prod
+  outputs:
+    prod:
+      type: duckdb
+      path: "finance.duckdb"
+      schema: FINANCE
+      threads: 1

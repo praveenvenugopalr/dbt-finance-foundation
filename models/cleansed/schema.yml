@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: stg_accounts
+    description: "Staged accounts from core banking system"
+    columns:
+      - name: account_id
+        description: "Primary key - unique account identifier"
+        tests: [unique, not_null]
+      - name: customer_id
+        description: "FK to customer"
+      - name: account_type
+        description: "SAV, CHQ, TD, LOAN"
+      - name: status
+        description: "ACTIVE, CLOSED, DORMANT"
+
+  - name: stg_transactions
+    description: "Staged transactions with type classification"
+    columns:
+      - name: transaction_id
+        description: "Primary key"
+        tests: [unique, not_null]
+      - name: amount
+        description: "Signed amount"
+      - name: channel
+        description: "BRANCH, ATM, MOBILE, INTERNET"
+
+  - name: stg_customers
+    description: "Staged customers with cleaned names"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        tests: [unique, not_null]
+      - name: segment
+        description: "RETAIL, PREMIUM, PRIVATE"
+
+  - name: stg_balances
+    description: "Staged daily balance snapshots"
+    columns:
+      - name: account_id
+        description: "FK to account"
+        tests: [not_null]
+      - name: balance_date
+        description: "Snapshot date"
+        tests: [not_null]
